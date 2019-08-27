@@ -1,4 +1,4 @@
-package com.stackroute.textcleansing;
+package com.stackroute.succour.textcleansing;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
