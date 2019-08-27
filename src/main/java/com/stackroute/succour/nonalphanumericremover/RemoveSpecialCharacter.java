@@ -43,57 +43,60 @@ public class RemoveSpecialCharacter
     }
 
     private static String cleanTextContent(String text) throws IOException {
-        text = Normalizer.normalize(text, Normalizer.Form.NFKD);
-        // strips off all non-ASCII characters
-        text = text.replaceAll("[^\\x00-\\x7F]", "").replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "").replaceAll("\\p{C}", "");
-        ;
-        String text1[] = text.split(" ");
-        for (int i = 0; i < text1.length; i++) {
-            text1[i] = text1[i].replaceAll("[^a-zA-Z]", "").toLowerCase();
-        }
-        StringTokenizer st1 = new StringTokenizer(text);
+        if (text.contains("#")) {
+            text = Normalizer.normalize(text, Normalizer.Form.NFKD);
+            // strips off all non-ASCII characters
+            text = text.replaceAll("[^\\x00-\\x7F]", "").replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "").replaceAll("\\p{C}", "");
+            ;
+            String text1[] = text.split(" ");
+            for (int i = 0; i < text1.length; i++) {
+                text1[i] = text1[i].replaceAll("[^a-zA-Z]", "").toLowerCase();
+            }
+            StringTokenizer st1 = new StringTokenizer(text);
 
-        for (int i = 1; st1.hasMoreTokens(); i++)
-            System.out.println("Token " + i + ": " + st1.nextToken());
+            for (int i = 1; st1.hasMoreTokens(); i++)
+                System.out.println("Token " + i + ": " + st1.nextToken());
 
-        String line;
-        InputStream fis = new FileInputStream("/home/cgi/Music/text-cleansing/dictionary.txt");
-        BufferedReader dictReader = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
-        //contains all words from file
-        //hashset is O(1) or O(log n) time for contains()
-        dict = new HashSet();
-        while ((line = dictReader.readLine()) != null) {
-            //build dictionary
-            dict.add(line);
+            String line;
+            InputStream fis = new FileInputStream("/home/cgi/Music/text-cleansing/dictionary.txt");
+            BufferedReader dictReader = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
+            //contains all words from file
+            //hashset is O(1) or O(log n) time for contains()
+            dict = new HashSet();
+            while ((line = dictReader.readLine()) != null) {
+                //build dictionary
+                dict.add(line);
+            }
+            // Done with the file
+            dictReader.close();
+            dictReader = null;
+            fis = null;
+            String mistake;
+            //Read misspelled words
+            InputStream test = new FileInputStream("/home/cgi/Music/text-cleansing/tokens.txt");
+            BufferedReader inputReader = new BufferedReader(new InputStreamReader(test, Charset.forName("UTF-8")));
+            while ((mistake = inputReader.readLine()) != null) {
+                //reset to allow dictionary search
+                found = false;
+                suggestion = "NO SUGGESTION";
+                //prompt for misspelled word
+                System.out.print("Wrong Word > ");
+                System.out.println(mistake);
+                //never need Upper case characters
+                mistake = mistake.toLowerCase();
+                //no english words have 3 repeated chars... pretty sure
+                mistake = removeTripleRepeat(mistake);
+                //find suggestion
+                if (checkIfDouble(mistake))
+                    checkRepeatLetters(mistake, 0, 0);
+                else // don't need to check repeat letters if there are none
+                    checkVowels(mistake, 0);
+                System.out.println(suggestion);
+            }
+            inputReader.close();
+            inputReader = null;
+
         }
-        // Done with the file
-        dictReader.close();
-        dictReader = null;
-        fis = null;
-        String mistake;
-        //Read misspelled words
-        InputStream test = new FileInputStream("/home/cgi/Music/text-cleansing/tokens.txt");
-        BufferedReader inputReader = new BufferedReader(new InputStreamReader(test, Charset.forName("UTF-8")));
-        while ((mistake = inputReader.readLine()) != null) {
-            //reset to allow dictionary search
-            found = false;
-            suggestion = "NO SUGGESTION";
-            //prompt for misspelled word
-            System.out.print("Wrong Word > ");
-            System.out.println(mistake);
-            //never need Upper case characters
-            mistake = mistake.toLowerCase();
-            //no english words have 3 repeated chars... pretty sure
-            mistake = removeTripleRepeat(mistake);
-            //find suggestion
-            if (checkIfDouble(mistake))
-                checkRepeatLetters(mistake, 0, 0);
-            else // don't need to check repeat letters if there are none
-                checkVowels(mistake, 0);
-            System.out.println(suggestion);
-        }
-        inputReader.close();
-        inputReader = null;
         return text;
     }
         public static boolean checkIfDouble(String word)
