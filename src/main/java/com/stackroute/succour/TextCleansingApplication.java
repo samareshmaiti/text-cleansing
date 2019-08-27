@@ -1,4 +1,4 @@
-package com.stackroute.succour.textcleansing;
+package com.stackroute.succour;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
