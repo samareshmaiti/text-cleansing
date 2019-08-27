@@ -47,11 +47,8 @@ public class RemoveSpecialCharacter
             text = Normalizer.normalize(text, Normalizer.Form.NFKD);
             // strips off all non-ASCII characters
             text = text.replaceAll("[^\\x00-\\x7F]", "").replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "").replaceAll("\\p{C}", "");
-            ;
-            String text1[] = text.split(" ");
-            for (int i = 0; i < text1.length; i++) {
-                text1[i] = text1[i].replaceAll("[^a-zA-Z]", "").toLowerCase();
-            }
+            text=text.replaceAll("[^a-zA-Z0-9\\s]", "");
+
             StringTokenizer st1 = new StringTokenizer(text);
 
             for (int i = 1; st1.hasMoreTokens(); i++)
